@@ -24,6 +24,13 @@
 
 <?php require_once 'app/views/templates/headerPublic.php'?>
 <main role="main" class="container">
+	<?php if (isset($_SESSION['failedAttempts']) || isset($_SESSION['invalidLogin'])): ?>
+		<div class="alert alert-warning" role="alert">
+		<p>Invalid login. Please try again.</p>
+		</div>
+	<?php endif; ?>
+
+	
 	<?php if ($lockedOut): ?>
 		<div class="alert alert-danger" role="alert">
 		<p>You are locked out. Please try again in <?= $lockoutUntil - time() ?> seconds.</p>
@@ -40,9 +47,6 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<h1>You are not logged in</h1>
-				<p>failedAttempts: <?= $_SESSION['failedAttempts'] ?></p>
-				<p>Locked out? <?= $lockedOut ? 'true' : 'false' ?></p>
-				<p>lockoutUntil: <?= $_SESSION['lockoutUntil'] ?></p>
 			</div>
 		</div>
 	</div>
@@ -67,3 +71,7 @@
 			</div>
 	</div>
 <?php require_once 'app/views/templates/footer.php' ?>
+
+<!-- failedAttempts: <?= $_SESSION['failedAttempts'] ?> -->
+<!-- Locked out? <?= $lockedOut ? 'true' : 'false' ?> -->
+<!-- lockoutUntil: <?= $_SESSION['lockoutUntil'] ?> -->

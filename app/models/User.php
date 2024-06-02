@@ -28,30 +28,39 @@ class User {
      */
     $username = strtolower($username);
     $db = db_connect();
-        $statement = $db->prepare("select * from users WHERE username = :name;");
-        $statement->bindValue(':name', $username);
-        $statement->execute();
-        $rows = $statement->fetch(PDO::FETCH_ASSOC);
-    
-    if (password_verify($password, $rows['password'])) {
-      $_SESSION['auth'] = 1;
-      $_SESSION['username'] = ucwords($username);
+    $statement = $db->prepare("select * from users WHERE username = :name;");
+    $statement->bindValue(':name', $username);
+    $statement->execute();
+    $rows = $statement->fetch(PDO::FETCH_ASSOC);
 
-      $this->username = ucwords($username);      
-      
-      unset($_SESSION['failedAttempts']);
+    // does user even exist?
+    if ($rows) {
+      if (password_verify($password, $rows['password'])) {
+        $_SESSION['auth'] = 1;
+        $_SESSION['username'] = ucwords($username);
 
-      // log successful authentication attempt
-      $this->logAuthenticationAttempt($username, true);
-      
-      header('Location: /home');
-      die;
+        $this->username = ucwords($username);      
+
+        unset($_SESSION['failedAttempts']);
+        unset($_SESSION['invalidLogin']);
+
+        // log successful authentication attempt
+        $this->logAuthenticationAttempt($username, true);
+
+        header('Location: /home');
+        die;
+      } else {
+        // log failed authentication attempt and redirect back to login
+        $this->logAuthenticationAttempt($username, false);
+        header('Location: /login');
+        die;
+      }
     } else {
-      // log failed authentication attempt and redirect back to login
-      $this->logAuthenticationAttempt($username, false);
+      $_SESSION['invalidLogin'] = 1;
+      // redirect back to login
       header('Location: /login');
       die;
-    }
+    }    
   }
 
   public function create($username, $password, $passwordConfirm) {
