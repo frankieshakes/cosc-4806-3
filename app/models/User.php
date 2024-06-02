@@ -40,9 +40,17 @@ class User {
       $this->username = ucwords($username);      
       
       unset($_SESSION['failedAuth']);
+      unset($_SESSION['failedAttempts']);
+
+      // log authentication
+      $this->logAuthenticationAttempt($username, true);
+      
       header('Location: /home');
       die;
     } else {
+      // log authentication
+      $this->logAuthenticationAttempt($username, false);
+
       if(isset($_SESSION['failedAuth'])) {
         $_SESSION['failedAuth'] ++; //increment
       } else {
@@ -95,6 +103,26 @@ class User {
        $_SESSION['failedSignup'] = 'There was a problem creating your account. Please try again later.';
       header('Location: /signup');
       die;
+    }
+  }
+
+  private function logAuthenticationAttempt($username, $success) {
+    $db = db_connect();
+    $statement = $db->prepare("insert into auth_logs (username, successful_attempt, timestamp) values (:name, :success, CURRENT_TIMESTAMP())");
+    $statement->bindValue(':name', $username);
+    $statement->bindValue(':success', $success ? 1 : 0);
+    $statement->execute();
+
+    if ($success == false) {
+      if (!isset($_SESSION['failedAttempts'])) {
+        $_SESSION['failedAttempts'] = 1;
+      } else {
+        // increment attempt count
+        $_SESSION['failedAttempts']++;
+        if ($_SESSION['failedAttempts'] >= 3) {
+          $_SESSION['lockoutUntil'] = time() + (30 * 1); // 30 seconds
+        }
+      }
     }
   }
 }
