@@ -39,23 +39,16 @@ class User {
 
       $this->username = ucwords($username);      
       
-      unset($_SESSION['failedAuth']);
       unset($_SESSION['failedAttempts']);
 
-      // log authentication
+      // log successful authentication attempt
       $this->logAuthenticationAttempt($username, true);
       
       header('Location: /home');
       die;
     } else {
-      // log authentication
+      // log failed authentication attempt and redirect back to login
       $this->logAuthenticationAttempt($username, false);
-
-      if(isset($_SESSION['failedAuth'])) {
-        $_SESSION['failedAuth'] ++; //increment
-      } else {
-        $_SESSION['failedAuth'] = 1;
-      }
       header('Location: /login');
       die;
     }
@@ -106,22 +99,24 @@ class User {
     }
   }
 
-  private function logAuthenticationAttempt($username, $success) {
+  private function logAuthenticationAttempt($username, $successfulAttempt) {
     $db = db_connect();
     $statement = $db->prepare("insert into auth_logs (username, successful_attempt, timestamp) values (:name, :success, CURRENT_TIMESTAMP())");
     $statement->bindValue(':name', $username);
-    $statement->bindValue(':success', $success ? 1 : 0);
+    $statement->bindValue(':success', $successfulAttempt ? 1 : 0);
     $statement->execute();
 
-    if ($success == false) {
-      if (!isset($_SESSION['failedAttempts'])) {
-        $_SESSION['failedAttempts'] = 1;
-      } else {
-        // increment attempt count
-        $_SESSION['failedAttempts']++;
+    // keep track of failed attempts
+    if (!$successfulAttempt) {
+      if(isset($_SESSION['failedAttempts'])) {
+        $_SESSION['failedAttempts'] ++; //increment
+
+        // lockout user if they have failed too many attempts
         if ($_SESSION['failedAttempts'] >= 3) {
           $_SESSION['lockoutUntil'] = time() + (30 * 1); // 30 seconds
-        }
+        }      
+      } else {
+        $_SESSION['failedAttempts'] = 1;
       }
     }
   }

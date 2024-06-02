@@ -1,13 +1,12 @@
 <?php
 	$lockedOut = false;
 
-	if (isset($_SESSION['signupSuccess'])) {
-		$signupSuccess = $_SESSION['signupSuccess'];
-		unset($_SESSION['signupSuccess']);
-	}
-
+	// Check if user is locked out
 	if (isset($_SESSION['lockoutUntil'])) {
 		$lockoutUntil = $_SESSION['lockoutUntil'];
+
+		// Check if lockout time has passed; if not, we're still locked out.
+		// If time has passed, we can reset the lockout time and attempts counter
 		if ($lockoutUntil > time()) {
 			$lockedOut = true;
 		} else {
@@ -16,31 +15,34 @@
 			unset($_SESSION['failedAttempts']);
 		}
 	}
+
+	if (isset($_SESSION['signupSuccess'])) {
+		$signupSuccess = $_SESSION['signupSuccess'];
+		unset($_SESSION['signupSuccess']);
+	}
 ?>
 
 <?php require_once 'app/views/templates/headerPublic.php'?>
 <main role="main" class="container">
-	<?php if (isset($signupSuccess)): ?>
-		<div class="alert alert-success" role="alert">
-			Account successfully created! Please log in below.
-		</div>
-	<?php endif; ?>
-
 	<?php if ($lockedOut): ?>
 		<div class="alert alert-danger" role="alert">
 		<p>You are locked out. Please try again in <?= $lockoutUntil - time() ?> seconds.</p>
 		</div>
 	<?php endif; ?>
 
+	<?php if ($signupSuccess): ?>
+		<div class="alert alert-success" role="alert">
+			<p>Account successfully created! Please log in below.</p>
+		</div>
+	<?php endif; ?>
 	
 	<div class="page-header" id="banner">
 		<div class="row">
 			<div class="col-lg-12">
-					<h1>You are not logged in</h1>
-					<p>failedAttempts: <?= $_SESSION['failedAttempts'] ?></p>
-					<p>lockoutUntil: <?= $_SESSION['lockoutUntil'] ?></p>
-					<p>Now? <?= time() ?></p>
-					<p>Locked out? <?= $lockedOut ? 'true' : 'false' ?></p>
+				<h1>You are not logged in</h1>
+				<p>failedAttempts: <?= $_SESSION['failedAttempts'] ?></p>
+				<p>Locked out? <?= $lockedOut ? 'true' : 'false' ?></p>
+				<p>lockoutUntil: <?= $_SESSION['lockoutUntil'] ?></p>
 			</div>
 		</div>
 	</div>
