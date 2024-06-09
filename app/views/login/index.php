@@ -46,7 +46,7 @@
 	<div class="page-header" id="banner">
 		<div class="row">
 			<div class="col-lg-12">
-				<h1>You are not logged in</h1>
+				<h1>Login</h1>
 			</div>
 		</div>
 	</div>
@@ -64,7 +64,8 @@
 							<input required type="password" class="form-control" name="password">
 						</div>
 						<br>
-						<button type="submit" class="btn btn-primary" <?= $lockedOut ? 'disabled' : '' ?>>Login</button> 
+						<button type="submit" class="btn btn-primary" <?= $lockedOut ? 'disabled' : '' ?>>Log in</button>
+						&nbsp;
 						Don't have an account? <a href="/signup">Sign up</a>.
 					</fieldset>
 				</form> 

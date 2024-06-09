@@ -39,6 +39,7 @@ if (isset($_SESSION['failedSignup'])) {
     </div>
     <br>
     <button type="submit" class="btn btn-primary">Sign up</button> 
+    &nbsp;
     Already have an account? <a href="/login">Log in</a>.
   </fieldset>
   </form> 
