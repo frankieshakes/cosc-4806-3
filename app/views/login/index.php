@@ -26,20 +26,20 @@
 <main role="main" class="container">
 	<?php if (isset($_SESSION['failedAttempts']) || isset($_SESSION['invalidLogin'])): ?>
 		<div class="alert alert-warning" role="alert">
-		<p>Invalid login. Please try again.</p>
+			Invalid login. Please try again.
 		</div>
 	<?php endif; ?>
 
 	
 	<?php if ($lockedOut): ?>
 		<div class="alert alert-danger" role="alert">
-		<p>You are locked out. Please try again in <?= $lockoutUntil - time() ?> seconds.</p>
+		You are locked out. Please try again in <?= $lockoutUntil - time() ?> seconds.
 		</div>
 	<?php endif; ?>
 
 	<?php if ($signupSuccess): ?>
 		<div class="alert alert-success" role="alert">
-			<p>Account successfully created! Please log in below.</p>
+			Account successfully created! Please log in below.
 		</div>
 	<?php endif; ?>
 	
